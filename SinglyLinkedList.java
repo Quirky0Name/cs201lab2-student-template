@@ -100,57 +100,58 @@ public class SinglyLinkedList<E extends Comparable<E>> {
     }
 
     // write your codes here
-    public void swap(){
+    public void swap() {
 
-        // get ArrayList of all elements
-        Map <Node<E>, Integer> originalIndexMap = new HashMap<>();
-        List<Node<E>> original = new ArrayList<>();
-        Map elementNode = new TreeMap<>();
-        Node current = head;
-        int index = 0;
+        // original order n sorted order
+        List<Node<E>> originalNodes = new ArrayList<>();
+        Map<E, Node<E>> elementNode = new TreeMap<>();
+
+        Node<E> current = head;
         while (current != null) {
-            original.add(current);
+            originalNodes.add(current);
             elementNode.put(current.getElement(), current);
-            originalIndexMap.put(current, index);
             current = current.getNext();
-            index++;
         }
 
-        List<Map.Entry<E, Node<E>>> entries = new ArrayList<>(elementNode.entrySet());
-// System.out.println(entries);
-        
-        int total = entries.size();
+        List<Map.Entry<E, Node<E>>> sortedEntries = new ArrayList<>(elementNode.entrySet());
+        int total = originalNodes.size();
 
-        // array to sort new node order
-        Node[] sortedNodes = new Node[total];
+        // map for swap 
+        Map<Node<E>, Node<E>> replacementMap = new HashMap<>();
         int left = 0;
         int right = total - 1;
-        while (left < right) {
-            Node small = entries.get(left).getValue();
-            Node big = entries.get(right).getValue();
-            int smallIndex = originalIndexMap.get(small);
-            int bigIndex = originalIndexMap.get(big);
 
-            sortedNodes[smallIndex] = big;
-            sortedNodes[bigIndex] = small;
+        while (left <= right) {
+            if (left == right) {
+                // middle, no swap
+                Node<E> middleNode = sortedEntries.get(left).getValue();
+                replacementMap.put(middleNode, middleNode);
+            } else {
+                Node<E> smallestNode = sortedEntries.get(left).getValue();
+                Node<E> largestNode = sortedEntries.get(right).getValue();
+
+                replacementMap.put(smallestNode, largestNode);
+                replacementMap.put(largestNode, smallestNode);
+            }
             left++;
             right--;
         }
-        if (left == right) { // handle middle
-            Node small = entries.get(left).getValue();
-            int smallIndex = original.indexOf(small);
-            sortedNodes[smallIndex] = small;
+
+        // new order for nodes
+        Node<E>[] resultNodes = (Node<E>[]) new Node[total];
+        for (int i = 0; i < total; i++) {
+            Node<E> orig = originalNodes.get(i);
+            resultNodes[i] = replacementMap.get(orig);
         }
-        
-        // build new links from order
-        head = sortedNodes[0];
+
+        // link nodes again
+        head = resultNodes[0];
         current = head;
         for (int i = 1; i < total; i++) {
-            current.setNext(sortedNodes[i]);
+            current.setNext(resultNodes[i]);
             current = current.getNext();
         }
         current.setNext(null);
-
     }
    
 }
