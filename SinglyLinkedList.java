@@ -103,13 +103,17 @@ public class SinglyLinkedList<E extends Comparable<E>> {
     public void swap(){
 
         // get ArrayList of all elements
+        Map <Node<E>, Integer> originalIndexMap = new HashMap<>();
         List<Node<E>> original = new ArrayList<>();
         Map elementNode = new TreeMap<>();
         Node current = head;
+        int index = 0;
         while (current != null) {
             original.add(current);
             elementNode.put(current.getElement(), current);
+            originalIndexMap.put(current, index);
             current = current.getNext();
+            index++;
         }
 
         List<Map.Entry<E, Node<E>>> entries = new ArrayList<>(elementNode.entrySet());
@@ -124,8 +128,8 @@ public class SinglyLinkedList<E extends Comparable<E>> {
         while (left < right) {
             Node small = entries.get(left).getValue();
             Node big = entries.get(right).getValue();
-            int smallIndex = original.indexOf(small);
-            int bigIndex = original.indexOf(big);
+            int smallIndex = originalIndexMap.get(small);
+            int bigIndex = originalIndexMap.get(big);
 
             sortedNodes[smallIndex] = big;
             sortedNodes[bigIndex] = small;
